@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<!-- 
-NOTE: This sample requires a bot which can send and receive specific event messages. Follow the instructions on 
-https://github.com/ryanvolum/backChannelBot to deploy such a bot. 
+<!--
+NOTE: This sample requires a bot which can send and receive specific event messages. Follow the instructions on
+https://github.com/ryanvolum/backChannelBot to deploy such a bot.
 
 This is a sample HTML file which shows how to embed an instance of WebChat which listens for event activities. For the sake
-of demonstration it specifically listens for events of name "changeBackground". Using the backChannelBot sample 
-our page can listen for events of name "changeBackground" and send events of name "buttonClicked". This 
-highlights the ability for a bot to communicate with a page that embeds the bot through WebChat. 
- 
+of demonstration it specifically listens for events of name "changeBackground". Using the backChannelBot sample
+our page can listen for events of name "changeBackground" and send events of name "buttonClicked". This
+highlights the ability for a bot to communicate with a page that embeds the bot through WebChat.
+
 1. Build the project: "npm run build"
 2. Start a web server: "npm run start"
 3. Aim your browser at "http://localhost:8000/samples/backchannel?[parameters as listed below]"
@@ -43,7 +43,7 @@ For ease of testing, several parameters can be set in the query string:
 <body>
 	<h2 style="font-family:Segoe UI;">Type a color into the WebChat!</h2>
 	<div id="BotChatGoesHere" class="wc-narrow"></div>
-	<button onclick="postButtonMessage()" style="width:120px;height:60px;padding:20px;margin-left:80px;margin-top:20px;">Click Me!</button>
+	<button id="initMessage" onclick="postButtonMessage()" style="display: none">Click Me!</button>
 
 	<script src="../../botchat.js"></script>
 	<script>
@@ -53,7 +53,7 @@ For ease of testing, several parameters can be set in the query string:
                 id: params['userid'] || 'userid',
                 name: params["username"] || 'username'
                 };
-            
+
             var bot = {
                 id: params['botid'] || 'botid',
                 name: params["botname"] || 'botname'
@@ -71,12 +71,24 @@ For ease of testing, several parameters can be set in the query string:
             BotChat.App({
                 botConnection: botConnection,
                 user: user,
-                bot: bot
+                bot: bot,
+								options: {
+										showHeader: false,
+										showMinimize: true,
+								}
             }, document.getElementById("BotChatGoesHere"));
+
 
             botConnection.activity$
                 .filter(activity => activity.type === "event" && activity.name === "changeBackground")
                 .subscribe(activity => changeBackgroundColor(activity.value))
+
+								/*botConnection.connectionStatus$
+										.subscribe(connectionStatus => {
+											if(connectionStatus == 2){
+												document.getElementById('initMessage').click();
+											}
+										});*/
 
             const changeBackgroundColor = (newColor) => {
                 document.body.style.backgroundColor = newColor;
@@ -84,7 +96,7 @@ For ease of testing, several parameters can be set in the query string:
 
             const postButtonMessage = () => {
                 botConnection
-                    .postActivity({type: "event", value: "", from: {id: "me" }, name: "buttonClicked"})
+                    .postActivity({type: "event", value: "", from: {id: "me" }, name: "conversationStart"})
                     .subscribe(id => console.log("success"));
             }
 

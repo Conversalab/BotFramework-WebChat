@@ -36,19 +36,19 @@ export const shell: Reducer<ShellState> = (
                 ... state,
                 input: action.input
             };
-        
+
         case 'Send_Message':
             return {
                 ... state,
                 input: ''
             };
-        
+
         case 'Set_Send_Typing':
             return {
                 ... state,
                 sendTyping: action.sendTyping
             };
-            
+
         default:
             return state;
     }
@@ -76,7 +76,8 @@ export const format: Reducer<FormatState> = (
     state: FormatState = {
         locale: 'en-us',
         options: {
-            showHeader: true
+            showHeader: true,
+            showMinimize: true,
         },
         strings: defaultStrings,
         carouselMargin: undefined
@@ -134,7 +135,6 @@ export const size: Reducer<SizeState> = (
             return state;
     }
 }
-
 
 export interface ConnectionState {
     connectionStatus: ConnectionStatus,
@@ -251,7 +251,7 @@ export const history: Reducer<HistoryState> = (
             if (state.activities.find(a => a.id === action.activity.id)) return state; // don't allow duplicate messages
 
             return {
-                ... state, 
+                ... state,
                 activities: [
                     ... state.activities.filter(activity => activity.type !== "typing"),
                     action.activity,
@@ -301,7 +301,7 @@ export const history: Reducer<HistoryState> = (
 
             const newActivity = {
                 ... activity,
-                id: action.type === 'Send_Message_Succeed' ? action.id : null                        
+                id: action.type === 'Send_Message_Succeed' ? action.id : null
             };
             return {
                 ... state,
@@ -312,7 +312,7 @@ export const history: Reducer<HistoryState> = (
         }
         case 'Show_Typing':
             return {
-                ... state, 
+                ... state,
                 activities: [
                     ... state.activities.filter(activity => activity.type !== "typing"),
                     ... state.activities.filter(activity => activity.from.id !== action.activity.from.id && activity.type === "typing"),
@@ -322,7 +322,7 @@ export const history: Reducer<HistoryState> = (
 
         case 'Clear_Typing':
             return {
-                ... state, 
+                ... state,
                 activities: state.activities.filter(activity => activity.id !== action.id),
                 selectedActivity: state.selectedActivity && state.selectedActivity.id === action.id ? null : state.selectedActivity
             };
@@ -435,7 +435,7 @@ const sendTyping: Epic<ChatActions, ChatState> = (action$, store) =>
     .filter(state => state.shell.sendTyping)
     .throttleTime(3000)
     .do(_ => konsole.log("sending typing"))
-    .flatMap(state => 
+    .flatMap(state =>
         state.connection.botConnection.postActivity({
             type: 'typing',
             from: state.connection.user
@@ -469,4 +469,3 @@ export const createStore = () =>
     );
 
 export type ChatStore = Store<ChatState>;
-

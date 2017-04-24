@@ -24,7 +24,7 @@ export class Carousel extends React.PureComponent<CarouselProps, {}> {
     private updateContentWidth() {
         //after the attachments have been rendered, we can now measure their actual width
         const width = this.props.size.width - this.props.format.carouselMargin;
-        
+
         //important: remove any hard styling so that we can measure the natural width
         this.root.style.width = '';
 
@@ -37,6 +37,14 @@ export class Carousel extends React.PureComponent<CarouselProps, {}> {
         }
     }
 
+    private isQuickReply(){
+      let firstAttachment = this.props.attachments[0];
+      return firstAttachment.contentType == "application/vnd.microsoft.card.thumbnail"
+      && !firstAttachment.content.title
+      && !firstAttachment.content.subtitle
+      && !firstAttachment.content.text
+    }
+
     componentDidMount() {
         this.updateContentWidth();
     }
@@ -46,10 +54,23 @@ export class Carousel extends React.PureComponent<CarouselProps, {}> {
     }
 
     render() {
-        return (
+
+        return this.isQuickReply()
+        ? (
+            <div className="wc-carousel quickreplies" ref={ div => this.root = div }>
+                <HScroll ref={ hscroll => this.hscroll = hscroll }
+                    prevSvgPathData="M 16.5 22 L 19 19.5 L 13.5 14 L 19 8.5 L 16.5 6 L 8.5 14 L 16.5 22 Z"
+                    nextSvgPathData="M 12.5 22 L 10 19.5 L 15.5 14 L 10 8.5 L 12.5 6 L 20.5 14 L 12.5 22 Z"
+                    scrollUnit="item"
+                >
+                    <CarouselAttachments { ... this.props }/>
+                </HScroll>
+            </div >
+        )
+        : (
             <div className="wc-carousel" ref={ div => this.root = div }>
                 <HScroll ref={ hscroll => this.hscroll = hscroll }
-                    prevSvgPathData="M 16.5 22 L 19 19.5 L 13.5 14 L 19 8.5 L 16.5 6 L 8.5 14 L 16.5 22 Z" 
+                    prevSvgPathData="M 16.5 22 L 19 19.5 L 13.5 14 L 19 8.5 L 16.5 6 L 8.5 14 L 16.5 22 Z"
                     nextSvgPathData="M 12.5 22 L 10 19.5 L 15.5 14 L 10 8.5 L 12.5 6 L 20.5 14 L 12.5 22 Z"
                     scrollUnit="item"
                 >

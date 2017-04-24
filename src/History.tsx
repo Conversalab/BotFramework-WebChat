@@ -47,11 +47,11 @@ export class HistoryView extends React.Component<HistoryProps, {}> {
 
             // Subtract the padding from the offsetParent's width to get the width of the content
             const maxContentWidth = (this.carouselActivity.messageDiv.offsetParent as HTMLElement).offsetWidth - paddedWidth;
-            
+
             // Subtract the content width from the chat width to get the margin.
             // Next time we need to get the content width (on a resize) we can use this margin to get the maximum content width
             const carouselMargin = this.props.size.width - maxContentWidth;
-            
+
             konsole.log('history measureMessage ' + carouselMargin);
 
             // Finally, save it away in the Store, which will force another re-render
@@ -72,10 +72,10 @@ export class HistoryView extends React.Component<HistoryProps, {}> {
     }
 
     // In order to do their cool horizontal scrolling thing, Carousels need to know how wide they can be.
-    // So, at startup, we create this mock Carousel activity and measure it. 
+    // So, at startup, we create this mock Carousel activity and measure it.
     private measurableCarousel = () =>
         // find the largest possible message size by forcing a width larger than the chat itself
-        <WrappedActivity 
+        <WrappedActivity
             ref={ x => this.carouselActivity = x }
             activity={ {
                 type: 'message',
@@ -157,7 +157,7 @@ export const History = connect(
         format: state.format,
         size: state.size,
         activities: state.history.activities,
-        // only used to create helper functions below 
+        // only used to create helper functions below
         connectionSelectedActivity: state.connection.selectedActivity,
         selectedActivity: state.history.selectedActivity,
         botConnection: state.connection.botConnection,
@@ -165,7 +165,7 @@ export const History = connect(
     }), {
         setMeasurements: (carouselMargin: number) => ({ type: 'Set_Measurements', carouselMargin }),
         onClickRetry: (activity: Activity) => ({ type: 'Send_Message_Retry', clientActivityId: activity.channelData.clientActivityId }),
-        // only used to create helper functions below 
+        // only used to create helper functions below
         sendMessage
     }, (stateProps: any, dispatchProps: any, ownProps: any) => ({
         // from stateProps

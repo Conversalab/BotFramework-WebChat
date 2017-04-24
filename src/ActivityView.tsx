@@ -21,7 +21,7 @@ const Attachments = (props: {
             attachments={ attachments }
             { ... otherProps }
         />
-    : 
+    :
         <div className="wc-list">
             { attachments.map((attachment, index) =>
                 <AttachmentView

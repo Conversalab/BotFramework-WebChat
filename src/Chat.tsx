@@ -5,11 +5,12 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
 import { Activity, Media, IBotConnection, User, MediaType, DirectLine, DirectLineOptions } from 'botframework-directlinejs';
-import { createStore, ChatActions } from './Store';
+import { createStore, ChatActions, ChatState } from './Store';
 import { Provider } from 'react-redux';
 
 export interface FormatOptions {
-    showHeader?: boolean
+    showHeader?: boolean,
+    showMinimize?: boolean,
 }
 
 export type ActivityOrID = {
@@ -28,6 +29,11 @@ export interface ChatProps {
     formatOptions?: FormatOptions,
     resize?: 'none' | 'window' | 'detect'
 }
+
+export interface DisplayState {
+    minimized?: boolean,
+}
+
 
 export const sendMessage = (text: string, from: User, locale: string) => ({
     type: 'Send_Message',
@@ -53,7 +59,7 @@ import { History } from './History';
 import { MessagePane } from './MessagePane';
 import { Shell } from './Shell';
 
-export class Chat extends React.Component<ChatProps, {}> {
+export class Chat extends React.Component<ChatProps, DisplayState> {
 
     private store = createStore();
 
@@ -65,6 +71,7 @@ export class Chat extends React.Component<ChatProps, {}> {
 
     private chatviewPanel: HTMLElement;
     private resizeListener = () => this.setSize();
+    private minimizeListener = () => this.toggleMinimize();
 
     constructor(props: ChatProps) {
         super(props);
@@ -80,6 +87,8 @@ export class Chat extends React.Component<ChatProps, {}> {
             this.store.dispatch<ChatActions>({ type: 'Set_Format_Options', options: props.formatOptions });
         if (props.sendTyping)
             this.store.dispatch<ChatActions>({ type: 'Set_Send_Typing', sendTyping: props.sendTyping });
+
+        this.state = { minimized: false };
     }
 
     private handleIncomingActivity(activity: Activity) {
@@ -103,6 +112,10 @@ export class Chat extends React.Component<ChatProps, {}> {
             width: this.chatviewPanel.offsetWidth,
             height: this.chatviewPanel.offsetHeight
         });
+    }
+
+    private toggleMinimize(){
+      this.setState({minimized: !this.state.minimized });
     }
 
     componentDidMount() {
@@ -160,6 +173,7 @@ export class Chat extends React.Component<ChatProps, {}> {
     }
 
     render() {
+        const store = this.store;
         const state = this.store.getState();
         konsole.log("BotChat.Chat state", state);
 
@@ -167,6 +181,8 @@ export class Chat extends React.Component<ChatProps, {}> {
         let header: JSX.Element;
         if (state.format.options.showHeader) header =
             <div className="wc-header">
+
+                <span className={state.format.options.showMinimize ? 'wc-header-minimize' : 'displayNone'} onClick={ this.minimizeListener } >−</span>
                 <span>{ state.format.strings.title }</span>
             </div>;
 
@@ -176,13 +192,18 @@ export class Chat extends React.Component<ChatProps, {}> {
 
         return (
             <Provider store={ this.store }>
-                <div className="wc-chatview-panel" ref={ div => this.chatviewPanel = div }>
-                    { header }
-                    <MessagePane setFocus={ () => this.setFocus() }>
-                        <History setFocus={ () => this.setFocus() }/>
-                    </MessagePane>
-                    <Shell />
-                    { resize }
+                <div  ref={ div => this.chatviewPanel = div }>
+                    <div className={this.state.minimized ? 'wc-minimized' : 'displayNone'}  onClick={ this.minimizeListener } >
+                        <img src='images/bubbleIcon.png' />
+                    </div>
+                    <div  className={!this.state.minimized ? 'wc-chatview-panel' : 'wc-hidden'}>
+                      { header }
+                      <MessagePane setFocus={ () => this.setFocus() }>
+                          <History setFocus={ () => this.setFocus() }/>
+                      </MessagePane>
+                      <Shell />
+                      { resize }
+                    </div>
                 </div>
             </Provider>
         );
@@ -206,6 +227,10 @@ export const doCardAction = (
 
         case "postBack":
             sendPostBack(botConnection, value, from, locale);
+            break;
+
+        case "openWebview":
+              window.open(value, "webview",  "width=420,height=230");
             break;
 
         case "call":

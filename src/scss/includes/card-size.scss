@@ -3,7 +3,7 @@ $card_normal: 320px;
 $card_wide: 416px;
 
 $card_borderWidth: 1px;
-$card_padding: 8px;
+$card_padding: 0;
 
 @mixin card-size($cardWidth) {
 
@@ -12,5 +12,5 @@ $card_padding: 8px;
         padding: $card_padding;
         width: $cardWidth - 2 * ($card_padding + $card_borderWidth);
     }
-    
+
 }

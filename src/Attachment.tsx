@@ -133,8 +133,8 @@ const Unknown = (props: {
 const mediaType = (url: string) =>
     url.slice((url.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase() == 'gif' ? 'image' : 'video';
 
-const title = (title: string) => renderIfNonempty(title, title => <h1>{ title }</h1>);
-const subtitle = (subtitle: string) => renderIfNonempty(subtitle, subtitle => <h2>{ subtitle }</h2>);
+const title = (title: string) => renderIfNonempty(title, title => <p className="s strong">{ title }</p>);
+const subtitle = (subtitle: string) => renderIfNonempty(subtitle, subtitle => <p className="s">{ subtitle }</p>);
 const text = (text: string) => renderIfNonempty(text, text => <p>{ text }</p>);
 
 export const AttachmentView = (props: {
@@ -143,10 +143,10 @@ export const AttachmentView = (props: {
     onCardAction: (type: string, value: string) => void,
     onImageLoad: () => void
 }) => {
+
     if (!props.attachment) return;
 
     const attachment = props.attachment;
-
     const onCardAction = (cardAction: CardAction) => cardAction &&
         (e => {
             props.onCardAction(cardAction.type, cardAction.value);
@@ -172,10 +172,14 @@ export const AttachmentView = (props: {
                 return null;
             return (
                 <div className='wc-card hero' onClick={ onCardAction(attachment.content.tap) }>
-                    { attachedImage(attachment.content.images) }
-                    { title(attachment.content.title) }
-                    { subtitle(attachment.content.subtitle) }
-                    { text(attachment.content.text) }
+                    <div className="carouselImageWrapper">
+                      { attachedImage(attachment.content.images) }
+                    </div>
+                    <div className="wc-card-text-container">
+                      { title(attachment.content.title) }
+                      { subtitle(attachment.content.subtitle) }
+                      { text(attachment.content.text) }
+                    </div>
                     { buttons(attachment.content.buttons) }
                 </div>
             );
@@ -183,13 +187,17 @@ export const AttachmentView = (props: {
         case "application/vnd.microsoft.card.thumbnail":
             if (!attachment.content)
                 return null;
+
             return (
                 <div className='wc-card thumbnail' onClick={ onCardAction(attachment.content.tap) }>
+                <div className="wc-card-text-container">
                     { title(attachment.content.title) }
                     { attachedImage(attachment.content.images) }
                     { subtitle(attachment.content.subtitle) }
                     { text(attachment.content.text) }
-                    { buttons(attachment.content.buttons) }
+                </div>
+                { buttons(attachment.content.buttons) }
+
                 </div>
             );
 
