@@ -521,6 +521,13 @@ $actionTransition: .2s cubic-bezier(0,0,.5,1);
         color: $c01;
     }
 
+    button img {
+      float: left;
+      height: 20px;
+      margin: 5px 5px 5px 0;
+      width: 20px;
+    }
+
     .wc-card-text-container {
       display: none;
     }

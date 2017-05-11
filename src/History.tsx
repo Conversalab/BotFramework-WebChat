@@ -99,7 +99,7 @@ export class HistoryView extends React.Component<HistoryProps, {}> {
     // 3. (this is also the normal re-render case) To render without the mock activity
 
     private doCardAction(type: string, value: string) {
-        this.props.setFocus();
+        //this.props.setFocus();
         return this.props.doCardAction(type, value);
     }
 
