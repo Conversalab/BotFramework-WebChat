@@ -169,7 +169,7 @@ export class Chat extends React.Component<ChatProps, DisplayState> {
     private setFocus() {
         // HUGE HACK - set focus back to input after clicking on an action
         // React makes this hard to do well, so we just do an end run around them
-        (this.chatviewPanel.querySelector(".wc-shellinput") as HTMLInputElement).focus();
+        (this.chatviewPanel.querySelector(".wc-shellinput") as HTMLInputElement).blur();
     }
 
     render() {
@@ -181,7 +181,6 @@ export class Chat extends React.Component<ChatProps, DisplayState> {
         let header: JSX.Element;
         if (state.format.options.showHeader) header =
             <div className="wc-header">
-
                 <span className={state.format.options.showMinimize ? 'wc-header-minimize' : 'displayNone'} onClick={ this.minimizeListener } >−</span>
                 <span>{ state.format.strings.title }</span>
             </div>;
@@ -199,7 +198,7 @@ export class Chat extends React.Component<ChatProps, DisplayState> {
                     <div  className={!this.state.minimized ? 'wc-chatview-panel' : 'wc-hidden'}>
                       { header }
                       <MessagePane setFocus={ () => this.setFocus() }>
-                          <History setFocus={ () => this.setFocus() }/>
+                          <History userProps={this.props.user} botProps={this.props.bot} setFocus={ () => this.setFocus() }/>
                       </MessagePane>
                       <Shell />
                       { resize }

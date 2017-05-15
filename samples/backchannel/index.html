@@ -25,7 +25,7 @@ For ease of testing, several parameters can be set in the query string:
 <head>
 	<meta charset="UTF-8" />
 	<title>Bot Chat</title>
-	<link href="../../botchat.css" rel="stylesheet" />
+	<link href="../../botchatTuenti.css" rel="stylesheet" />
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<style>
@@ -43,61 +43,68 @@ For ease of testing, several parameters can be set in the query string:
 <body>
 	<h2 style="font-family:Segoe UI;">Type a color into the WebChat!</h2>
 	<div id="BotChatGoesHere" class="wc-narrow"></div>
-	<button id="initMessage" onclick="postButtonMessage()" style="display: none">Click Me!</button>
 
 	<script src="../../botchat.js"></script>
 	<script>
             var params = BotChat.queryParams(location.search);
-
             var user = {
                 id: params['userid'] || 'userid',
-                name: params["username"] || 'username'
+                name: params["username"] || 'username',
+								iconUrl: 'images/avatarUser.png',
                 };
 
             var bot = {
                 id: params['botid'] || 'botid',
-                name: params["botname"] || 'botname'
+                name: params["botname"] || 'COnversalab!',
+								iconUrl: 'images/avatarBot.png',
             };
 
             window['botchatDebug'] = params['debug'] && params['debug'] === "true";
 
-            var botConnection = new BotChat.DirectLine({
+						var directLineConfig = {
                 secret: params['s'],
                 token: params['t'],
                 domain: params['domain'],
-                webSocket: params['webSocket'] && params['webSocket'] === "true" // defaults to true
-            });
+								webSocket: true,
+						}
+
+						if(localStorage.chatConversation){
+							var chatConversation = JSON.parse(localStorage.chatConversation);
+							if(chatConversation.secret == params['s']){
+								directLineConfig.conversationId = chatConversation.conversationId;
+								directLineConfig.watermark = chatConversation.watermark;
+							} else {
+								localStorage.removeItem('chatConversation');
+							}
+						}
+
+            var botConnection = new BotChat.DirectLine(directLineConfig);
 
             BotChat.App({
                 botConnection: botConnection,
                 user: user,
                 bot: bot,
-								options: {
+								formatOptions: {
 										showHeader: false,
-										showMinimize: true,
+										showMinimize: false,
 								}
             }, document.getElementById("BotChatGoesHere"));
 
-
             botConnection.activity$
-                .filter(activity => activity.type === "event" && activity.name === "changeBackground")
-                .subscribe(activity => changeBackgroundColor(activity.value))
+                .subscribe(activity => storeWatermark(botConnection.watermark))
 
-								/*botConnection.connectionStatus$
-										.subscribe(connectionStatus => {
-											if(connectionStatus == 2){
-												document.getElementById('initMessage').click();
-											}
-										});*/
+						botConnection.connectionStatus$
+								.subscribe(connectionStatus => {
+									if(connectionStatus == 2 && localStorage.chatConversation === undefined){
+										chatConversation = JSON.stringify({secret: botConnection.secret, conversationId: botConnection.conversationId, watermark: ''});
+										localStorage.setItem('chatConversation', chatConversation);
+									}
+								});
 
-            const changeBackgroundColor = (newColor) => {
-                document.body.style.backgroundColor = newColor;
-            }
-
-            const postButtonMessage = () => {
-                botConnection
-                    .postActivity({type: "event", value: "", from: {id: "me" }, name: "conversationStart"})
-                    .subscribe(id => console.log("success"));
+            const storeWatermark = (watermark) => {
+                var chatConversation = JSON.parse(localStorage.chatConversation);
+								chatConversation.watermark = watermark;
+								localStorage.setItem('chatConversation', JSON.stringify(chatConversation));
             }
 
         </script>

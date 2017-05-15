@@ -9,6 +9,8 @@ export interface HistoryProps {
     format: FormatState,
     size: SizeState,
     activities: Activity[],
+    user: User,
+    bot: User,
 
     sendMessage: (text: string, from: User, locale: string) => void,
     setMeasurements: (carouselMargin: number) => void,
@@ -19,7 +21,9 @@ export interface HistoryProps {
     isFromMe: (activity: Activity) => boolean,
     isSelected: (activity: Activity) => boolean,
     onClickActivity: (activity: Activity) => React.MouseEventHandler<HTMLDivElement>,
-    doCardAction: (type: string, value: string) => void
+    doCardAction: (type: string, value: string) => void,
+
+
 }
 
 export class HistoryView extends React.Component<HistoryProps, {}> {
@@ -83,6 +87,8 @@ export class HistoryView extends React.Component<HistoryProps, {}> {
                 from: { id: '' },
                 attachmentLayout: 'carousel'
             } }
+            user = { null }
+            bot = { null }
             format={ null }
             fromMe={ false }
             onClickActivity={ null }
@@ -99,7 +105,7 @@ export class HistoryView extends React.Component<HistoryProps, {}> {
     // 3. (this is also the normal re-render case) To render without the mock activity
 
     private doCardAction(type: string, value: string) {
-        this.props.setFocus();
+        //this.props.setFocus();
         return this.props.doCardAction(type, value);
     }
 
@@ -117,6 +123,8 @@ export class HistoryView extends React.Component<HistoryProps, {}> {
                         format={ this.props.format }
                         key={ 'message' + index }
                         activity={ activity }
+                        user = { this.props.user }
+                        bot = { this.props.bot }
                         showTimestamp={ index === this.props.activities.length - 1 || (index + 1 < this.props.activities.length && suitableInterval(activity, this.props.activities[index + 1])) }
                         selected={ this.props.isSelected(activity) }
                         fromMe={ this.props.isFromMe(activity) }
@@ -172,6 +180,8 @@ export const History = connect(
         format: stateProps.format,
         size: stateProps.size,
         activities: stateProps.activities,
+        user: ownProps.userProps,
+        bot: ownProps.botProps,
         // from dispatchProps
         setMeasurements: dispatchProps.setMeasurements,
         onClickRetry: dispatchProps.onClickRetry,
@@ -209,6 +219,8 @@ const suitableInterval = (current: Activity, next: Activity) =>
 
 export interface WrappedActivityProps {
     activity: Activity,
+    user: User,
+    bot: User,
     showTimestamp: boolean,
     selected: boolean,
     fromMe: boolean,
@@ -262,9 +274,13 @@ export class WrappedActivity extends React.Component<WrappedActivityProps, {}> {
             this.props.selected && 'selected'
         );
 
+        const showAvatar = this.props.user && ((who == 'me' && this.props.user.iconUrl) || (who == 'bot' && this.props.bot.iconUrl)) ? true : false;
         return (
             <div data-activity-id={ this.props.activity.id } className={ wrapperClassName } onClick={ this.props.onClickActivity }>
-                <div className={ 'wc-message wc-message-from-' + who } ref={ div => this.messageDiv = div }>
+                <div className={ showAvatar ? 'showAvatar wc-message wc-message-from-' + who : 'wc-message wc-message-from-' + who } ref={ div => this.messageDiv = div }>
+                    { showAvatar  &&
+                    <img className='avatar' src={who == 'me' ? this.props.user.iconUrl : this.props.bot.iconUrl} />
+                    }
                     <div className={ contentClassName }>
                         <svg className="wc-message-callout">
                             <path className="point-left" d="m0,6 l6 6 v-12 z" />

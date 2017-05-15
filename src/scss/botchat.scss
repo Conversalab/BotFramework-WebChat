@@ -643,7 +643,19 @@ $actionTransition: .2s cubic-bezier(0,0,.5,1);
 
     .wc-message-from-me {
         float: right;
-        margin-right: 6px;
+        padding-right: 6px;
+    }
+
+    .showAvatar.wc-message-from-me {
+      padding-right: 2.1em;
+    }
+
+    .showAvatar.wc-message-from-me .avatar {
+      height: 1.6em;
+      position: absolute;
+      right: 0;
+      top: 5px;
+      width: 1.6em;
     }
 
     .wc-message-from-me.wc-message-from {
@@ -667,11 +679,28 @@ $actionTransition: .2s cubic-bezier(0,0,.5,1);
         right: -6px;
     }
 
+    .showAvatar.wc-message-from-me svg.wc-message-callout {
+      right: 1.8em;
+    }
+
+
 /* from bot */
 
     .wc-message-from-bot {
         float: left;
-        margin-left: 8px;
+        padding-left: 8px;
+    }
+
+    .showAvatar.wc-message-from-bot {
+      padding-left: 2.1em;
+    }
+
+    .showAvatar.wc-message-from-bot .avatar {
+      height: 1.6em;
+      position: absolute;
+      left: 0;
+      top: 5px;
+      width: 1.6em;
     }
 
     .wc-message-from-bot .wc-message-content {
@@ -689,6 +718,10 @@ $actionTransition: .2s cubic-bezier(0,0,.5,1);
 
     .wc-message-from-bot svg.wc-message-callout {
         left: -6px;
+    }
+
+    .showAvatar.wc-message-from-bot svg.wc-message-callout {
+      left: 1.7em;
     }
 
 /* console */
