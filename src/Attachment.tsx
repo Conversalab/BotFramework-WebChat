@@ -155,10 +155,9 @@ export const AttachmentView = (props: {
 
     const buttons = (buttons: CardAction[]) => buttons &&
         <ul className="wc-card-buttons">
-            { buttons.map((button, index) => button.image
-                ? <li key={ index }><button onClick={ onCardAction(button) }><img src={button.image} /> { button.title }</button></li>
-                : <li key={ index }><button onClick={ onCardAction(button) }>{ button.title }</button></li>
-            ) }
+
+            { buttons.map((button, index) => <li key={ index }><button onClick={ onCardAction(button) }>{ button.image ? (<img src={button.image} />) : (null) } { button.title }</button></li>) }
+
         </ul>;
 
     const attachedImage = (
@@ -167,17 +166,16 @@ export const AttachmentView = (props: {
             tap?: CardAction // deprecated field for Skype channels. For testing legacy bots in Emulator only.
         }[]
     ) => images && images.length > 0 &&
-        <Media src={ images[0].url } onLoad={ props.onImageLoad } onClick={ onCardAction(images[0].tap) } />;
+        <div className="carouselImageWrapper"><Media src={ images[0].url } onLoad={ props.onImageLoad } onClick={ onCardAction(images[0].tap) } /></div>;
 
     switch (attachment.contentType) {
         case "application/vnd.microsoft.card.hero":
             if (!attachment.content)
                 return null;
+
             return (
                 <div className='wc-card hero' onClick={ onCardAction(attachment.content.tap) }>
-                    <div className="carouselImageWrapper">
-                      { attachedImage(attachment.content.images) }
-                    </div>
+                    { attachedImage(attachment.content.images) }
                     <div className="wc-card-text-container">
                       { title(attachment.content.title) }
                       { subtitle(attachment.content.subtitle) }
