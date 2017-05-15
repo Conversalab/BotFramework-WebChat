@@ -155,7 +155,9 @@ export const AttachmentView = (props: {
 
     const buttons = (buttons: CardAction[]) => buttons &&
         <ul className="wc-card-buttons">
+
             { buttons.map((button, index) => <li key={ index }><button onClick={ onCardAction(button) }>{ button.image ? (<img src={button.image} />) : (null) } { button.title }</button></li>) }
+
         </ul>;
 
     const attachedImage = (
